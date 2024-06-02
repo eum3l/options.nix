@@ -1,33 +1,26 @@
 {
   description = "options.nix, a function for generating markdown documentation from nixos modules.";
 
-  inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
-  };
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs";
 
   outputs =
+    { self, nixpkgs }:
     {
-      self,
-      nixpkgs,
-      flake-utils,
-    }:
-    flake-utils.lib.eachDefaultSystem (
-      system:
-      let
-        pkgs = import nixpkgs { inherit system; };
-      in
-      {
-        formatter = pkgs.nixfmt-rfc-style;
-        lib.mkOptionScript = pkgs.callPackage (
+      lib.mkOptionScript =
+        {
+          system,
+          module,
+          modulePrefix,
+          optionsFile ? "OPTIONS.md",
+        }:
+        let
+          pkgs = import nixpkgs { inherit system; };
+        in
+        pkgs.callPackage (
           {
             path,
             nixosOptionsDoc,
-            pkgs,
             writers,
-            module,
-            modulePrefix,
-            optionsFile ? "OPTIONS.md",
           }:
           let
             src =
@@ -63,7 +56,6 @@
               | str join " "
               | save -rf ${optionsFile} 
           ''
-        );
-      }
-    );
+        ) { };
+    };
 }
