@@ -45,6 +45,7 @@
             $'
             ## ($i.name)
             ($i.option.description | str trim)
+            
             ### Type
             ```
             ($i.option.type)
